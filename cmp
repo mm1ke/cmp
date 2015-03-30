@@ -33,11 +33,16 @@ title=$($CMUSREMOTE -Q|grep "tag title")	# ${title:9}
 album=$($CMUSREMOTE -Q|grep "tag album")	# ${album:9}
 year=$($CMUSREMOTE -Q|grep "tag date")		# ${date:8}
 genre=$($CMUSREMOTE -Q|grep "tag genre")	# ${genre:9}
+file=$($CMUSREMOTE -Q|grep file)
 
 if [ ${duration} -eq "-1" ]; then
 	percent="$[position/60]min"
 	$KDIALOG --title "CMUS is playing... ($percent)" --passivepopup "Radio: ${title:9}i\nGenre: ${genre:9}" 3
 else
 	percent="$[100*position/duration]%"
-	$KDIALOG --title "CMUS is playing... ($percent)" --passivepopup "Artist: ${artist:10}\nTitle: ${title:9}\nAlbum: ${album:9} (${year:9})" 3
+	if [ -z ${artist} ]; then
+		$KDIALOG --title "CMUS is playing... ($percent)" --passivepopup "File: ${file##*/}" 3
+	else
+		$KDIALOG --title "CMUS is playing... ($percent)" --passivepopup "Artist: ${artist:10}\nTitle: ${title:9}\nAlbum: ${album:9} (${year:9})" 3
+	fi
 fi
