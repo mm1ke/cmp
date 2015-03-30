@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# Filename: cmus-play
+# Autor: Michael Mair-Keimberger (m DOT mairkeimberger AT gmail DOT com)
+# Date: 26.04.12
+
+# Copyright (C) 2011  Michael Mair-Keimberger
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+# Discription:
+# small script for knotify to show what cmus is playing
+
+KDIALOG="/usr/bin/kdialog"
+CMUSREMOTE="/usr/bin/cmus-remote"
+
+declare -i duration=$($CMUSREMOTE -Q|grep "duration"|awk '{ print $2 }')
+declare -i position=$($CMUSREMOTE -Q|grep "position"|awk '{ print $2 }')
+artist=$($CMUSREMOTE -Q|grep "tag artist")	# ${artist:10}
+title=$($CMUSREMOTE -Q|grep "tag title")	# ${title:9}
+album=$($CMUSREMOTE -Q|grep "tag album")	# ${album:9}
+year=$($CMUSREMOTE -Q|grep "tag date")		# ${date:8}
+genre=$($CMUSREMOTE -Q|grep "tag genre")	# ${genre:9}
+
+if [ ${duration} -eq "-1" ]; then
+	percent="$[position/60]min"
+	$KDIALOG --title "CMUS is playing... ($percent)" --passivepopup "Radio: ${title:9}i\nGenre: ${genre:9}" 3
+else
+	percent="$[100*position/duration]%"
+	$KDIALOG --title "CMUS is playing... ($percent)" --passivepopup "Artist: ${artist:10}\nTitle: ${title:9}\nAlbum: ${album:9} (${year:9})" 3
+fi
